@@ -30,29 +30,34 @@ document.querySelector('#selectphoto').onchange = function(e){
     //var myurl = window.url.createObjectURL(selected);
    //alert(selected.innerHTML);
     // ...
-
-	var img = new Image();
-	img.src = selected[0].src;
-	alert(img.width)
-	alert(decode(img));
+	
+	selected[0].onload = function() {
+		var ctx = document.createElement('canvas').getContext('2d');
+		ctx.canvas.width = selected[0].width;
+		ctx.canvas.height = selected[0].height;
+		ctx.drawImage(selected[0], 0, 0);
+		alert(ctx.canvas.width);
+		alert(ctx.canvas.height);
+		alert(decode(ctx));
+	}
 }
 
+// artificially limit the message size
+var maxMessageSize = 1000;
+
 // decode the image and display the contents if there is anything
-var decode = function(img) {
-    var password = null;
+var decode = function(ctx) {
+	//document.write("<script src='sjcl.js' type='text/javascript'></script>");
+	
+    var password = "";
     var passwordFail = 'Password is incorrect or there is nothing here.';
 
     // decode the message with the supplied password
-	var canvas = document.createElement('canvas');
-	var ctx = canvas.getContext('2d');
-	ctx.canvas.width = img.width;
-	ctx.canvas.height = img.height;
-	ctx.drawImage(img, 0, 0);
-	alert(img.width)
-	alert(ctx.canvas.width)
     var imgData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
     var message = decodeMessage(imgData.data, sjcl.hash.sha256.hash(password));
 
+	alert("message=");
+	alert(message);
     // try to parse the JSON
     var obj = null;
     try {
@@ -60,8 +65,8 @@ var decode = function(img) {
     } catch (e) {
         // display the "choose" view
 
-        document.getElementById('choose').style.display = 'block';
-        document.getElementById('reveal').style.display = 'none';
+        //document.getElementById('choose').style.display = 'block';
+        //document.getElementById('reveal').style.display = 'none';
 
         if (password.length > 0) {
             alert(passwordFail);

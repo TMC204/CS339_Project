@@ -38,7 +38,8 @@ var importImage = function(e) {
             ctx.canvas.width = img.width;
             ctx.canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
-
+			alert(img.width);
+			alert(img.height);
 			alert(decode());
         };
         img.src = event.target.result;
